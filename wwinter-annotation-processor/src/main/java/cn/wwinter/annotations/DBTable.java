@@ -1,4 +1,4 @@
-package cn.wwinter;
+package cn.wwinter.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
  * Author: zhangdd
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface DBTable {
+    String name() default "";
 }
