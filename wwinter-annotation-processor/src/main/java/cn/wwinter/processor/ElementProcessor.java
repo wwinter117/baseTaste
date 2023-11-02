@@ -8,5 +8,5 @@ package cn.wwinter.processor;
  * Author: zhangdd
  */
 public interface ElementProcessor<P, R> {
-    R process(R resource);
+    R process(P resource);
 }

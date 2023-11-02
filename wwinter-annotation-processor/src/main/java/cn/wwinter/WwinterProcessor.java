@@ -1,23 +1,20 @@
 package cn.wwinter;
 
-import cn.wwinter.annotations.DBTable;
-import cn.wwinter.annotations.SQLLong;
-import cn.wwinter.annotations.SQLString;
+import cn.wwinter.annotations.*;
+import cn.wwinter.model.TableInfo;
+import cn.wwinter.model.MetaField;
 import cn.wwinter.processor.ElementProcessor;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import javax.annotation.processing.*;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.ElementKindVisitor6;
-import javax.tools.JavaFileObject;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * ClassName: WwinterProcessor
@@ -32,64 +29,115 @@ import java.util.Set;
         "cn.wwinter.annotations.SQLString"
 })
 public class WwinterProcessor extends AbstractProcessor {
-    private Filer filer;
+
+    private static final List<Class<? extends Annotation>> ANNOTATIONS = new ArrayList<>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        filer = processingEnv.getFiler();
+        ANNOTATIONS.add(SQLInteger.class);
+        ANNOTATIONS.add(SQLLong.class);
+        ANNOTATIONS.add(SQLString.class);
+        ANNOTATIONS.add(SQLDate.class);
+        ANNOTATIONS.add(SQLTime.class);
+
+        System.out.println(" ____      ____            _            _                  \n" +
+                           "|_  _|    |_  _|          (_)          / |_                \n" +
+                           "  \\ \\  /\\  / /_   _   __  __   _ .--. `| |-'.---.  _ .--.  \n" +
+                           "   \\ \\/  \\/ /[ \\ [ \\ [  ][  | [ `.-. | | | / /__\\\\[ `/'`\\] \n" +
+                           "    \\  /\\  /  \\ \\/\\ \\/ /  | |  | | | | | |,| \\__., | |     \n" +
+                           "     \\/  \\/    \\__/\\__/  [___][___||__]\\__/ '.__.'[___]    \n");
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (!roundEnv.processingOver()) {
+
+        if (!roundEnv.processingOver() && annotations != null) {
             Set<TypeElement> tables = getTables(annotations, roundEnv);
+            if (tables.isEmpty()) {
+                return true;
+            }
             System.out.println("------- 待处理表：-------");
             tables.forEach(System.out::println);
-            System.out.println("------- 开始生成SQL -------");
+            System.out.println("------- 表信息： -------");
+            TableInfo tableInfo = null;
+            for (TypeElement table : tables) {
+                tableInfo = processTable(table);
+                System.out.println(table.getSimpleName() + " : " + tableInfo);
+            }
+            System.out.println("------- 开始处理... -------");
             long start = System.currentTimeMillis();
 
-            for (TypeElement table : tables) {
-                genCreateSql(table);
-            }
+
+
             System.out.println("------- 处理完毕，耗时：" + (System.currentTimeMillis() - start) + "ms -------");
         }
         return true;
     }
 
-    private void genCreateSql(TypeElement table) {
-        System.out.println("开始处理表：" + table);
-        String tableName = table.getAnnotationsByType(DBTable.class)[0].name();
-        String sql = "CREATE TABLE `" + tableName + "` (\n  ";
-        List<? extends Element> fields = table.getEnclosedElements();
-        for (Element element : fields) {
-            if (element.getKind() == ElementKind.FIELD) {
-                List<? extends AnnotationMirror> annotations = element.getAnnotationMirrors();
-//                List<ElementProcessor> processors = getFieldProcessors();
+    private TableInfo processTable(TypeElement table) {
+        List<Element> fields = getFields(table);
+        TableInfo tableInfo = processFields(fields);
+        tableInfo.setTableName(table.getAnnotation(DBTable.class).name());
+        return tableInfo;
+    }
 
-
-//                for (AnnotationMirror annotation : annotations) {
-//                    handleAnnotation(sql, annotation);
-//                }
+    /**
+     * TODO: 没有多态这里怎么做
+     */
+    private TableInfo processFields(List<Element> fields) {
+        TableInfo tableInfo = new TableInfo();
+        List<MetaField> metaFields = new ArrayList<>();
+        for (Element field : fields) {
+            String name = null;
+            int length = 0;
+            boolean primaryKey = false;
+            boolean allowNull = true;
+            boolean unique = false;
+            if (field.getAnnotation(SQLLong.class) != null) {
+                SQLLong sqlLong = field.getAnnotation(SQLLong.class);
+                name = sqlLong.name();
+                length = sqlLong.length();
+                primaryKey = sqlLong.primaryKey();
+                allowNull = sqlLong.allowNull();
+                unique = sqlLong.unique();
+            } else if (field.getAnnotation(SQLString.class) != null) {
+                SQLString sqlString = field.getAnnotation(SQLString.class);
+                name = sqlString.name();
+                length = sqlString.length();
+                primaryKey = sqlString.primaryKey();
+                allowNull = sqlString.allowNull();
+                unique = sqlString.unique();
+            } else if (field.getAnnotation(SQLInteger.class) != null) {
+                SQLInteger sqlInteger = field.getAnnotation(SQLInteger.class);
+                name = sqlInteger.name();
+                length = sqlInteger.length();
+                primaryKey = sqlInteger.primaryKey();
+                allowNull = sqlInteger.allowNull();
+                unique = sqlInteger.unique();
+            } else if (field.getAnnotation(SQLDate.class) != null) {
+                SQLDate sqlDate = field.getAnnotation(SQLDate.class);
+                name = sqlDate.name();
+                length = sqlDate.length();
+                primaryKey = sqlDate.primaryKey();
+                allowNull = sqlDate.allowNull();
+                unique = sqlDate.unique();
             }
+            MetaField metaField = new MetaField();
+            metaField.setName(name);
+            metaField.setLength(length);
+            metaField.setPrimaryKey(primaryKey);
+            metaField.setAllowNull(allowNull);
+            metaField.setUnique(unique);
+            metaFields.add(metaField);
         }
-        System.out.println("sql = " + sql);
+        tableInfo.setFields(metaFields);
+        return tableInfo;
     }
 
-    private void handleAnnotation(String sql, AnnotationMirror annotation) {
-//        System.out.println("annotation = " + annotation);
-        if (annotation instanceof SQLLong) {
-            SQLLong aLong = (SQLLong) annotation;
-            String name = aLong.name();
-            sql += name;
-        } else if (annotation instanceof SQLString) {
-            String name = ((SQLString) annotation).name();
-            sql += name;
-        } else {
-            System.out.println("false");
-        }
-    }
-
+    /**
+     * get all tables which has `@DBTable`
+     */
     private Set<TypeElement> getTables(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Set<TypeElement> tableType = new HashSet<>();
         for (TypeElement annotation : annotations) {
@@ -102,6 +150,19 @@ public class WwinterProcessor extends AbstractProcessor {
             }
         }
         return tableType;
+    }
+
+    /**
+     * get a table`s all fields
+     */
+    private List<Element> getFields(TypeElement table) {
+        List<Element> fields = new ArrayList<>();
+        for (Element element : table.getEnclosedElements()) {
+            if (element.getKind() == ElementKind.FIELD) {
+                fields.add(element);
+            }
+        }
+        return fields;
     }
 
     private TypeElement asTypeElement(Element element) {
@@ -121,33 +182,83 @@ public class WwinterProcessor extends AbstractProcessor {
         );
     }
 
-    /**
-     * 生成源代码
-     *
-     * @param packageName 包路径
-     * @param classname   类名
-     */
-    private void writeFile(String packageName, String classname, Element element) {
-        JavaFileObject file = null;
-        PrintWriter printWriter = null;
-        try {
-            file = filer.createSourceFile(classname, element);
-            printWriter = new PrintWriter(file.openWriter());
-            printWriter.println("package " + packageName + ";");
-            printWriter.println("// 由注解处理器WwinterProcessor生成");
-            printWriter.println("public class " + classname + " {");
-            printWriter.println();
-            printWriter.println("}");
-            printWriter.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            printWriter.close();
+
+
+
+
+
+
+
+    private void genCreateSql(TypeElement table) {
+        System.out.println("开始处理表：" + table);
+        String tableName = table.getAnnotationsByType(DBTable.class)[0].name();
+        StringBuilder sql = new StringBuilder();
+        sql.append("CREATE TABLE ").append(tableName).append("\n  ");
+        List<? extends Element> fields = table.getEnclosedElements();
+        List<MetaField> metaFields = new ArrayList<>();
+        for (Element element : fields) {
+            if (element.getKind() == ElementKind.FIELD) {
+                System.out.println("element = " + element);
+                List<? extends AnnotationMirror> annotations = element.getAnnotationMirrors();
+                metaFields.add(processAnnotations(annotations));
+            }
         }
+//        for (MetaField metaField : metaFields) {
+//            sql.append(metaField.getName()).append(' ').append(metaField.getJdbcType().name());
+//            if (metaField.getLength() != 0) {
+//                sql.append('(').append(metaField.getLength()).append(')');
+//            }
+//            if (metaField.isPrimaryKey()) {
+//                sql.append("PRIMARY KEY,");
+//            }
+//            if (!metaField.isAllowNull()) {
+//                sql.append("NOT NULL,");
+//            }
+//            if (metaField.isUnique()) {
+//                sql.append("UNIQUE,");
+//            }
+//        }
+        System.out.println("sql = " + sql);
     }
 
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return super.getSupportedSourceVersion();
+    private MetaField processAnnotations(List<? extends AnnotationMirror> annotations) {
+        AnnotationMirror anno = annotations.stream().filter(s -> s.getAnnotationType().equals(SQLLong.class.getCanonicalName()))
+                .findFirst()
+                .orElse(null);
+        if (anno == null) {
+            return null;
+        }
+        System.out.println("anno = " + anno);
+        MetaField metaField = null;
+        for (ElementProcessor<?, ?> processor : getFieldProcessors()) {
+            metaField = (MetaField) processAnno(processor, anno);
+            if (metaField != null) {
+                break;
+            }
+        }
+        return metaField;
     }
+
+    @SuppressWarnings("unchecked")
+    private <P, R> R processAnno(ElementProcessor<P, R> processor, AnnotationMirror anno) {
+        P param = (P) anno;
+        return processor.process(param);
+    }
+
+    private List<ElementProcessor<?, ?>> getFieldProcessors() {
+        @SuppressWarnings("rawtypes")
+        ServiceLoader<ElementProcessor> processors = ServiceLoader.load(ElementProcessor.class, WwinterProcessor.class.getClassLoader());
+        List<ElementProcessor<?, ?>> list = new ArrayList<>();
+        for (ElementProcessor<?, ?> processor : processors) {
+            if (processor != null) {
+                list.add(processor);
+            }
+        }
+        return list;
+    }
+
+
+
+
+
 }
