@@ -21,7 +21,7 @@ public class SQLDecimalProcessor implements SQLElementProcessor {
         if (anno == null) {
             return null;
         }
-        return generatorMetaField(anno.name(), anno.length(), anno.primaryKey(), anno.allowNull(), anno.unique());
+        return generatorMetaField(anno.name(), anno.length(), anno.primaryKey(), anno.allowNull(), anno.unique(), anno.comment());
     }
 
 }

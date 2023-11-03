@@ -17,13 +17,14 @@ public interface SQLElementProcessor extends ElementProcessor<Element, MetaField
 
     default MetaField generatorMetaField(
             String name, int length, boolean primaryKey, 
-            boolean allowNull, boolean unique) {
+            boolean allowNull, boolean unique, String comment) {
         MetaField metaField = new MetaField();
         metaField.setName(name);
         metaField.setLength(length);
         metaField.setPrimaryKey(primaryKey);
         metaField.setUnique(unique);
         metaField.setAllowNull(allowNull);
+        metaField.setComment(comment);
         return metaField;
     }
 }

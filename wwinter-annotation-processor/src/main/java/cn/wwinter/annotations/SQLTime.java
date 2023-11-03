@@ -24,4 +24,6 @@ public @interface SQLTime {
     boolean allowNull() default true;
 
     boolean unique() default false;
+    
+    String comment() default "";
 }

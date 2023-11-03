@@ -20,11 +20,12 @@ public class MetaField {
     boolean primaryKey;
     boolean allowNull;
     boolean unique;
+    private String comment;
 
     public MetaField() {
     }
 
-    public MetaField(String name, JavaType javaType, JdbcType jdbcType, int length, boolean primaryKey, boolean allowNull, boolean unique) {
+    public MetaField(String name, JavaType javaType, JdbcType jdbcType, int length, boolean primaryKey, boolean allowNull, boolean unique, String comment) {
         this.name = name;
         this.javaType = javaType;
         this.jdbcType = jdbcType;
@@ -32,6 +33,7 @@ public class MetaField {
         this.primaryKey = primaryKey;
         this.allowNull = allowNull;
         this.unique = unique;
+        this.comment = comment;
     }
 
     public String getName() {
@@ -90,6 +92,14 @@ public class MetaField {
         this.unique = unique;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return "{" +
@@ -100,6 +110,7 @@ public class MetaField {
                 ", primaryKey=" + primaryKey +
                 ", allowNull=" + allowNull +
                 ", unique=" + unique +
+                ", comment=" + comment +
                 '}';
     }
 }

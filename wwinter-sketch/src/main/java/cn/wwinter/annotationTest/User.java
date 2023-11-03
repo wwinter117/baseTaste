@@ -13,12 +13,12 @@ import java.util.Date;
  */
 @DBTable(name = "user")
 public class User {
-    @SQLLong(name = "id", length = 20, primaryKey = true)
+    @SQLLong(name = "id", length = 20, primaryKey = true, comment = "主键id")
     private Long id;
-    @SQLString(name = "name", length = 20)
+    @SQLString(name = "name", length = 20, comment = "姓名")
     private String name;
-    @SQLInteger(name = "age", length = 5)
+    @SQLInteger(name = "age", length = 5, comment = "年龄")
     private Integer age;
-    @SQLDate(name = "birthDay")
+    @SQLDate(name = "birthDay", comment = "生日")
     private Date birthDay;
 }
