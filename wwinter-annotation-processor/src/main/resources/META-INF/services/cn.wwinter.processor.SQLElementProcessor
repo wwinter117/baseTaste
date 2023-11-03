@@ -1,0 +1,7 @@
+cn.wwinter.processor.SQLLongProcessor
+cn.wwinter.processor.SQLStringProcessor
+cn.wwinter.processor.SQLBooleanProcessor
+cn.wwinter.processor.SQLDateProcessor
+cn.wwinter.processor.SQLDecimalProcessor
+cn.wwinter.processor.SQLIntegerProcessor
+cn.wwinter.processor.SQLTimeProcessor

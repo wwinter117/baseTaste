@@ -1,10 +1,8 @@
 package cn.wwinter.processor;
 
-import cn.wwinter.annotations.SQLString;
+import cn.wwinter.annotations.SQLInteger;
 import cn.wwinter.model.MetaField;
-import com.sun.tools.javac.code.Attribute;
 
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 
 /**
@@ -14,11 +12,11 @@ import javax.lang.model.element.Element;
  * Datetime: 2023/11/1
  * Author: zhangdd
  */
-public class SQLStringProcessor implements SQLElementProcessor {
+public class SQLIntegerProcessor implements SQLElementProcessor {
 
     @Override
     public MetaField process(Element field) {
-        SQLString anno = field.getAnnotation(SQLString.class);
+        SQLInteger anno = field.getAnnotation(SQLInteger.class);
         if (anno == null) {
             return null;
         }
