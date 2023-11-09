@@ -1,9 +1,14 @@
 package cn.wwinter;
 
 import cn.wwinter.annotations.*;
+import cn.wwinter.freemaker.GetSqlHandler;
+import cn.wwinter.freemaker.TemplateHandler;
 import cn.wwinter.model.TableInfo;
 import cn.wwinter.model.MetaField;
 import cn.wwinter.processor.SQLElementProcessor;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.AnnotationMirror;
@@ -11,6 +16,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementKindVisitor6;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -57,20 +65,39 @@ public class WwinterProcessor extends AbstractProcessor {
             }
             System.out.println("------- 待处理表：-------");
             tables.forEach(System.out::println);
-            System.out.println("------- 表信息： -------");
             TableInfo tableInfo = null;
+            int i = 0;
             for (TypeElement table : tables) {
+                System.out.println("------- " + i + " 表信息： -------");
                 tableInfo = processTable(table);
                 System.out.println(table.getSimpleName() + " : " + tableInfo);
+
+                System.out.println("开始处理...");
+                long start = System.currentTimeMillis();
+
+                StringBuilder sqls = new StringBuilder();
+                List<GetSqlHandler> templateHandlers = getTemplateHandlers();
+                for (GetSqlHandler handler : templateHandlers) {
+                    String sql = handler.handle(tableInfo);
+                    sqls.append(sql).append("\n");
+                }
+                System.out.println(sqls);
+                System.out.println("处理完毕，耗时：" + (System.currentTimeMillis() - start) + "ms");
+                i++;
             }
-            System.out.println("------- 开始处理... -------");
-            long start = System.currentTimeMillis();
-            
-
-
-            System.out.println("------- 处理完毕，耗时：" + (System.currentTimeMillis() - start) + "ms -------");
         }
         return true;
+    }
+
+    private List<GetSqlHandler> getTemplateHandlers() {
+        ServiceLoader<GetSqlHandler> load = ServiceLoader.load(GetSqlHandler.class, WwinterProcessor.class.getClassLoader());
+        List<GetSqlHandler> list = new ArrayList<>();
+        for (GetSqlHandler handler : load) {
+            if (handler != null) {
+                list.add(handler);
+            }
+        }
+        return list;
     }
 
     private TableInfo processTable(TypeElement table) {

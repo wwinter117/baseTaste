@@ -2,9 +2,7 @@ package cn.wwinter.processor;
 
 import cn.wwinter.model.MetaField;
 
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import java.lang.annotation.Annotation;
 
 /**
  * ClassName: SQLElementProcessor

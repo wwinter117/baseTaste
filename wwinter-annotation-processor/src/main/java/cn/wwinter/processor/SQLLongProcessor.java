@@ -1,6 +1,8 @@
 package cn.wwinter.processor;
 
 import cn.wwinter.annotations.SQLLong;
+import cn.wwinter.enums.JavaType;
+import cn.wwinter.enums.JdbcType;
 import cn.wwinter.model.MetaField;
 
 import javax.lang.model.element.Element;
@@ -19,6 +21,9 @@ public class SQLLongProcessor implements SQLElementProcessor {
         if (anno == null) {
             return null;
         }
-        return generatorMetaField(anno.name(), anno.length(), anno.primaryKey(), anno.allowNull(), anno.unique(), anno.comment());
+        MetaField metaField = generatorMetaField(anno.name(), anno.length(), anno.primaryKey(), anno.allowNull(), anno.unique(), anno.comment());
+        metaField.setJavaType(JavaType.LONG);
+        metaField.setJdbcType(JdbcType.INT);
+        return metaField;
     }
 }

@@ -1,6 +1,8 @@
 package cn.wwinter.processor;
 
 import cn.wwinter.annotations.SQLInteger;
+import cn.wwinter.enums.JavaType;
+import cn.wwinter.enums.JdbcType;
 import cn.wwinter.model.MetaField;
 
 import javax.lang.model.element.Element;
@@ -20,7 +22,10 @@ public class SQLIntegerProcessor implements SQLElementProcessor {
         if (anno == null) {
             return null;
         }
-        return generatorMetaField(anno.name(), anno.length(), anno.primaryKey(), anno.allowNull(), anno.unique(), anno.comment());
+        MetaField metaField = generatorMetaField(anno.name(), anno.length(), anno.primaryKey(), anno.allowNull(), anno.unique(), anno.comment());
+        metaField.setJavaType(JavaType.INTEGER);
+        metaField.setJdbcType(JdbcType.INTEGER);
+        return metaField;
     }
 
 }

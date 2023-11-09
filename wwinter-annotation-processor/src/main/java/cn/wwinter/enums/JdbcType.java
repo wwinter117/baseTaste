@@ -8,6 +8,7 @@ package cn.wwinter.enums;
  * Author: zhangdd
  */
 public enum JdbcType {
+    INT,
     INTEGER,
     BIGINT,
     SMALLINT,

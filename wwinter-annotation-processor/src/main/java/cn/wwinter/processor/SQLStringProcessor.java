@@ -1,10 +1,9 @@
 package cn.wwinter.processor;
 
 import cn.wwinter.annotations.SQLString;
+import cn.wwinter.enums.JavaType;
+import cn.wwinter.enums.JdbcType;
 import cn.wwinter.model.MetaField;
-import com.sun.tools.javac.code.Attribute;
-
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 
 /**
@@ -22,7 +21,10 @@ public class SQLStringProcessor implements SQLElementProcessor {
         if (anno == null) {
             return null;
         }
-        return generatorMetaField(anno.name(), anno.length(), anno.primaryKey(), anno.allowNull(), anno.unique(), anno.comment());
+        MetaField metaField = generatorMetaField(anno.name(), anno.length(), anno.primaryKey(), anno.allowNull(), anno.unique(), anno.comment());
+        metaField.setJavaType(JavaType.STRING);
+        metaField.setJdbcType(JdbcType.VARCHAR);
+        return metaField;
     }
 
 }

@@ -1,0 +1,4 @@
+cn.wwinter.freemaker.CreateHandler
+cn.wwinter.freemaker.DeleteHandler
+cn.wwinter.freemaker.InsertHandler
+cn.wwinter.freemaker.UpdateHandler
