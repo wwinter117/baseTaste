@@ -17,7 +17,6 @@ import java.util.Map;
 public abstract class AbstractTemplateHandler implements GetSqlHandler {
     private static final String BASE_PATH;
     private static final Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
-    private Template template;
 
     static {
         BASE_PATH = "/freemaker/templates";
@@ -27,7 +26,7 @@ public abstract class AbstractTemplateHandler implements GetSqlHandler {
 
     public String generateSql(Map<String, Object> dataModel, String templateName) {
         try {
-            template = cfg.getTemplate(templateName);
+            Template template = cfg.getTemplate(templateName);
             StringWriter writer = new StringWriter();
             template.process(dataModel, writer);
             return writer.toString();

@@ -14,6 +14,7 @@ import javax.lang.model.element.TypeElement;
  */
 public class MetaField {
     private String name;
+    private String tableName;
     private JavaType javaType;
     private JdbcType jdbcType;
     private int length;
@@ -25,8 +26,9 @@ public class MetaField {
     public MetaField() {
     }
 
-    public MetaField(String name, JavaType javaType, JdbcType jdbcType, int length, boolean primaryKey, boolean allowNull, boolean unique, String comment) {
+    public MetaField(String name, String tableName, JavaType javaType, JdbcType jdbcType, int length, boolean primaryKey, boolean allowNull, boolean unique, String comment) {
         this.name = name;
+        this.tableName = tableName;
         this.javaType = javaType;
         this.jdbcType = jdbcType;
         this.length = length;
@@ -42,6 +44,14 @@ public class MetaField {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
     public JavaType getJavaType() {
@@ -104,6 +114,7 @@ public class MetaField {
     public String toString() {
         return "{" +
                 "name='" + name + '\'' +
+                ", tableName=" + tableName +
                 ", javaType=" + javaType +
                 ", jdbcType=" + jdbcType +
                 ", length=" + length +

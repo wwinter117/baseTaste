@@ -1,4 +1,6 @@
+cn.wwinter.freemaker.ResultMapHandler
+cn.wwinter.freemaker.SqlFieldsHandler
 cn.wwinter.freemaker.CreateHandler
+cn.wwinter.freemaker.UpdateHandler
 cn.wwinter.freemaker.DeleteHandler
 cn.wwinter.freemaker.InsertHandler
-cn.wwinter.freemaker.UpdateHandler
