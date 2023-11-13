@@ -2,23 +2,16 @@ package cn.wwinter;
 
 import cn.wwinter.annotations.*;
 import cn.wwinter.freemaker.GetSqlHandler;
-import cn.wwinter.freemaker.TemplateHandler;
 import cn.wwinter.model.TableInfo;
 import cn.wwinter.model.MetaField;
 import cn.wwinter.processor.SQLElementProcessor;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-
 import javax.annotation.processing.*;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementKindVisitor6;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -34,6 +27,7 @@ import java.util.*;
         "cn.wwinter.annotations.SQLLong",
         "cn.wwinter.annotations.SQLString"
 })
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class WwinterProcessor extends AbstractProcessor {
 
     private static final List<Class<? extends Annotation>> ANNOTATIONS = new ArrayList<>();
@@ -53,6 +47,8 @@ public class WwinterProcessor extends AbstractProcessor {
                            "   \\ \\/  \\/ /[ \\ [ \\ [  ][  | [ `.-. | | | / /__\\\\[ `/'`\\] \n" +
                            "    \\  /\\  /  \\ \\/\\ \\/ /  | |  | | | | | |,| \\__., | |     \n" +
                            "     \\/  \\/    \\__/\\__/  [___][___||__]\\__/ '.__.'[___]    \n");
+
+        System.out.println("更新时间：" + new Date());
     }
 
     @Override

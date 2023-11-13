@@ -1,10 +1,16 @@
 package cn.wwinter.freemaker;
 
+import cn.wwinter.enums.JavaType;
+import cn.wwinter.model.MetaField;
+import cn.wwinter.model.TableInfo;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,5 +39,20 @@ public abstract class AbstractTemplateHandler implements GetSqlHandler {
         } catch (Exception e) {
             throw new RuntimeException("freemaker生成异常：",e);
         }
+    }
+
+    public static <T extends TableInfo> T test(T t) {
+        for (MetaField field : t.getFields()) {
+            System.out.println("  " + field);
+        }
+        for (Method method : t.getClass().getDeclaredMethods()) {
+            System.out.println(method);
+        }
+        return t;
+    }
+
+    public static void main(String[] args) {
+        TableInfo test = test(new TableInfo("user", Arrays.asList(new MetaField(), new MetaField())));
+
     }
 }
